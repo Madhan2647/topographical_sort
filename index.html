@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>NetViz Pro – Network Topology Visualizer & Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- ✅ Working docx library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+</head>
+
+<body>
+  <header class="app-header">
+    <h1 class="logo">NetViz Pro</h1>
+    <p class="tagline">Interactive Network Topology Visualizer & Simulator</p>
+    <nav class="top-buttons">
+      <button class="navBtn" data-modal="learnModal">Learn</button>
+      <button class="navBtn" data-modal="devModal">Developed By</button>
+      <button class="navBtn" data-modal="helpModal">Help</button>
+      <button id="downloadHeaderBtn">📄 Download Log</button>
+    </nav>
+  </header>
+
+  <div class="controls">
+    <label for="topology">Topology:</label>
+    <select id="topology">
+      <option value="bus">Bus</option>
+      <option value="star">Star</option>
+      <option value="ring">Ring</option>
+      <option value="mesh">Mesh</option>
+      <option value="tree">Tree</option>
+      <option value="custom">Custom (DAG)</option>
+    </select>
+    <button id="buildBtn">Build</button>
+    <button id="addEdgeBtn">Add Edge</button>
+    <button id="resetBtn">Reset</button>
+
+    <label for="algorithm">Algorithm:</label>
+    <select id="algorithm">
+      <option value="topo">Topological Sort (Kahn)</option>
+      <option value="bfs">BFS Traversal</option>
+    </select>
+    <button id="runAlgoBtn">Run Algorithm</button>
+  </div>
+
+  <main class="main-layout">
+    <canvas id="networkCanvas" width="850" height="450"></canvas>
+
+    <div class="chat-panel">
+      <h2>Network Chat & Controls</h2>
+
+      <div class="selectors">
+        <div>Sender: <span id="senderLabel">—</span></div>
+        <div>Receiver: <span id="receiverLabel">—</span></div>
+      </div>
+
+      <div class="select-buttons">
+        <button id="selectSenderBtn">Select Sender</button>
+        <button id="selectReceiverBtn">Select Receiver</button>
+        <button id="clearSelectionBtn">Clear</button>
+      </div>
+
+      <input type="text" id="chatInput" placeholder="Type message..." />
+      <button id="sendBtn">Send Message</button>
+
+      <div id="chatLog" class="chat-log"></div>
+
+      <hr>
+
+      <h3>Node Control</h3>
+      <div class="node-editor">
+        <label for="nodeSelect">Select Node:</label>
+        <select id="nodeSelect" class="dark-select">
+          <option value="">— Choose Node —</option>
+        </select>
+        <button id="deleteBtn" class="danger">Delete Node</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ✅ Learn Modal: Topology-Focused Theory -->
+  <div id="learnModal" class="modal">
+    <div class="modal-inner">
+      <span class="close">&times;</span>
+      <h2>Learn — Network Topologies & Theories</h2>
+      <p>
+        The summaries below explain the fundamental and advanced concepts of network topologies,
+        focusing on structure, communication, and real-world applications.
+      </p>
+
+      <h3>1. Introduction to Network Topology</h3>
+      <p>
+        Network topology defines how devices (nodes) are arranged and interconnected in a network.
+        It affects performance, fault tolerance, scalability, and data flow efficiency.
+      </p>
+
+      <h3>2. Physical vs Logical Topology</h3>
+      <p>
+        Physical topology refers to the actual layout of cables and devices.
+        Logical topology describes how data moves within the network — sometimes different from the physical layout.
+      </p>
+
+      <h3>3. Bus Topology</h3>
+      <p>
+        All devices share a single communication line (backbone). It’s simple and cost-effective,
+        but a single cable fault can disrupt the entire network.
+      </p>
+
+      <h3>4. Star Topology</h3>
+      <p>
+        Every node connects to a central hub or switch. It offers high reliability — failure of one link doesn’t affect others,
+        but hub failure stops the whole network.
+      </p>
+
+      <h3>5. Ring Topology</h3>
+      <p>
+        Devices are connected in a closed loop. Data travels in one direction until it reaches the destination.
+        Failure in one link can affect communication unless dual rings are used.
+      </p>
+
+      <h3>6. Mesh Topology</h3>
+      <p>
+        Each device is connected to every other device. Provides excellent redundancy and reliability but requires many cables and ports.
+      </p>
+
+      <h3>7. Tree & Hybrid Topologies</h3>
+      <p>
+        Tree topology combines star and bus structures — often used in hierarchical networks.
+        Hybrid topologies mix two or more types for flexibility and performance.
+      </p>
+
+      <h3>8. Topology Metrics & Evaluation</h3>
+      <p>
+        Metrics like diameter, degree, latency, cost, and fault tolerance help compare and evaluate topologies.
+        Proper design balances performance and budget.
+      </p>
+
+      <h3>9. Topology Algorithms</h3>
+      <p>
+        Algorithms such as Spanning Tree Protocol (STP), Shortest Path (Dijkstra), and Topological Sort
+        are used to manage, optimize, and analyze network structures.
+      </p>
+
+      <h3>10. Real-World Applications</h3>
+      <p>
+        LANs often use star or hybrid topologies, while data centers employ mesh or leaf-spine designs.
+        Understanding topology is key for simulation, fault analysis, and network optimization.
+      </p>
+
+      <h3>Video Tutorial — Network Topologies</h3>
+      <iframe width="100%" height="320" src="https://www.youtube.com/embed/zbqrNg4C98U" frameborder="0" allowfullscreen></iframe>
+
+      <p style="margin-top:10px;">
+        For detailed theory and diagrams, refer to:
+        <a href="https://jcer.in/jcer-docs/E-Learning/Digital%20Library%20/E-Books/Data-Communications-and-Network-5e.pdf"
+           target="_blank" rel="noopener">
+          Forouzan — Data Communications & Networking (PDF)
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Developed By Modal -->
+  <div id="devModal" class="modal">
+    <div class="modal-inner dev-grid">
+      <span class="close">&times;</span>
+      <h2 style="text-align:center; margin-bottom:14px;">Developed By</h2>
+
+      <div class="dev-row">
+        <div class="dev-person">
+          <img src="MADHAN.jpg" class="dev-photo" alt="Madhan">
+          <div class="dev-name">Madhan M</div>
+          <div class="dev-reg">24BCE1063</div>
+        </div>
+
+        <div class="dev-person">
+          <img src="ABHISHEK.jpg" class="dev-photo" alt="Abhishek">
+          <div class="dev-name">N S Abhishek</div>
+          <div class="dev-reg">24BCE1040</div>
+        </div>
+      </div>
+
+      <h2 style="text-align:center; margin-top:20px;">Guided By</h2>
+      <div class="dev-row-guided" style="justify-content:center; margin-top:10px;">
+        <div class="dev-person-guided">
+          <img src="SWAMINATHAN.jpg" class="dev-photo" alt="Dr. Swaminathan">
+          <div class="dev-name">Dr. Swaminathan Annadurai</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal">
+    <div class="modal-inner">
+      <span class="close">&times;</span>
+      <h2>Help & Step-by-Step Guide</h2>
+
+      <p style="margin-bottom:10px;">
+        Below is a complete, explicit walkthrough of every interaction in NetViz Pro. Follow each numbered step precisely to perform the task.
+      </p>
+
+      <h3>Quick Video Guide</h3>
+      <p>Short video walkthrough (click to watch in-place):</p>
+      <iframe width="100%" height="320" src="https://www.youtube.com/embed/zbqrNg4C98U" frameborder="0" allowfullscreen></iframe>
+
+      <hr>
+
+      <h3>1. Creating Nodes</h3>
+      <ol>
+        <li>Click inside the black canvas to add nodes labeled N1, N2, etc.</li>
+        <li>Ensure nodes don’t overlap; use nearby empty space.</li>
+        <li>New nodes appear in the “Select Node” dropdown.</li>
+      </ol>
+
+      <h3>2. Adding and Deleting Edges</h3>
+      <ol>
+        <li>Click “Add Edge,” then select Node A and Node B on the canvas.</li>
+        <li>Edges are directed (A → B) and logged instantly.</li>
+        <li>Use “Delete Node” to remove a node and its edges.</li>
+      </ol>
+
+      <h3>3. Running Algorithms</h3>
+      <ol>
+        <li>Select an algorithm: <strong>Topological Sort (Kahn)</strong> or <strong>BFS Traversal</strong>.</li>
+        <li>Click “Run Algorithm” to visualize and log each step.</li>
+      </ol>
+
+      <h3>4. Chat Function</h3>
+      <ol>
+        <li>Select sender and receiver nodes.</li>
+        <li>Type a message and click “Send Message.”</li>
+        <li>The system finds a path (via BFS) and animates message transfer.</li>
+      </ol>
+
+      <h3>5. Reset and Download Log</h3>
+      <ol>
+        <li>Click “Reset” to clear everything.</li>
+        <li>Click “📄 Download Log” to save all actions.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
